@@ -1,5 +1,7 @@
 Ts = 0.005
-
+y = load('y_motore.mat').y
+t = load('t_motore.mat').t
+u(1) = 12
 s=tf('s')
 %% Filter signal
 % With 10 seconds, and Ts = 0.005 we have 2000 samples, so 20 windowSize
