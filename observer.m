@@ -14,7 +14,7 @@ rank(W0)
 Sett_time = 0.8;
 zeta = 1;
 w0 = 5.8/Sett_time;
-p = -w0*zeta/10;
+p = -w0*zeta*10;
 
 syms s l1 l2 l3
 L = [l1;l2;l3];
