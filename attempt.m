@@ -42,8 +42,29 @@ G_pade = mu/(1+s*T)* (1-0.5*tau*s)/(1+0.5*tau*s)
 y_w = y_w*12
 y_pade = y_pade*12
 
-%plot(t,y_filtered,t_pade,y_pade,t_w,y_w);
-%legend('y filtered','G pade','G')
+plot(t,y_filtered,t_pade,y_pade,t_w,y_w);
+legend('y filtered','G pade','G')
+
+%% test da buttare
+
+G1 = mu/(1+s*T)*exp(-(tau/10)*s)
+G2 = G
+
+% rad/s to rpm
+[y1,t1] = step(G1,t(length(t)))
+[y2,t2] = step(G2,t(length(t)))
+y1 = y1*12
+y2 = y2*12
+
+figure;
+plot(t,y_filtered)
+hold on
+plot(t1,y1)
+plot(t2,y2)
+legend('y filtered','G1_veloce','G')
+hold off
+
+%%
 
 G_without_delay = G/s/9.5493
 num = 6.567

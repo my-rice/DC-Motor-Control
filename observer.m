@@ -29,9 +29,6 @@ l3 = eval(sol.l3)
 L = [l1;l2;l3];
 %%
 
-
-
-
 L = inv(W0)*W0_tilde*[pd1-a1;pd2-a2];
 L = eval(L);
 
