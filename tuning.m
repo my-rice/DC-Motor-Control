@@ -15,7 +15,7 @@ plot(t,y_filtered)
 
 n = size(y_filtered)
 S1 = 0
-y_overline = y_filtered(n)
+y_overline = y_filtered(length(y_filtered))
 for i = 1:n-1
     S1 = S1 +(y_overline-y_filtered(i))*(t(i+1)-t(i));% definizione di integrale, f * \delta T, che suppongo essere sufficientemente piccolo
 end
@@ -35,8 +35,8 @@ G_senza_pade = mu/(1+s*T)
 
 %% Approssimazione di Padè in ss
 G_senza_delay = G_senza_pade/s/9.5493;
-num = [0 0 6.726];
-den = [1.037 9.549 0];
+num = [0 0 6.734];
+den = [1.199 9.549 0];
 [A,B,C,D] = tf2ss(num,den);
 %A = [0 1; 0 -9.2081]
 %B = [0; 61.9337]
@@ -62,6 +62,11 @@ Q = [0.01 0 0 0; 0 10 0 0; 0 0 0.01 0; 0 0 0 5]
 R =  0.87*10
 [K_tilde,S,e] = lqi(ss(A,B,C,D),Q,R,0)
 kr = -1/(C*inv(A-B*K_tilde(1:3))*B)
+
+%% Discretizzazione
+K_discreta = K_tilde(1:3)
+sys_int = tf([K_tilde(3)],[1 0])
+sys_int_d = c2d(sys_int,Ts,'tustin')
 
 
 %% Approssimazione di Padè in ss
