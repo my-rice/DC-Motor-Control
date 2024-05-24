@@ -1,2 +1,8 @@
 *.slxc
 slprj/*
+tuning_ert_rtw/*
+*.autosave
+*.elf
+*.hex
+*.bin
+*.asv
