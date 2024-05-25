@@ -3,15 +3,15 @@ B = [-1;0;8];
 C = [0, 5.6163, 0];
 D = 0;
 
-K_tilde = [1.0706    9.0642    0.2639   -0.7581];
-kr = -1/(C*inv(A-B*K_tilde(1:3))*B);
+%K_tilde = [1.9673   17.3897    0.4808   -2.3973];
+%kr = -1/(C*inv(A-B*K_tilde(1:3))*B);
 
 %
 W0 = [C;C*A;C*A^2];
 rank(W0)
 
 % calcolo dei coefficienti del polinomio desiderato
-Sett_time = 0.8;
+Sett_time = 0.2;
 zeta = 1;
 w0 = 5.8/Sett_time;
 p = -w0*zeta*10;

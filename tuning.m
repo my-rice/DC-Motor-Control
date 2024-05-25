@@ -58,16 +58,17 @@ B = sys_pade.B
 C = sys_pade.C
 
 D = sys_pade.D
-Q = [0.01 0 0 0; 0 10 0 0; 0 0 0.01 0; 0 0 0 5]
-R =  0.87*10
+Q = [0.01 0 0 0; 0 15 0 0; 0 0 0.01 0; 0 0 0 1]
+R =  0.08
 [K_tilde,S,e] = lqi(ss(A,B,C,D),Q,R,0)
 kr = -1/(C*inv(A-B*K_tilde(1:3))*B)
 
 %% Discretizzazione
 K_discreta = K_tilde(1:3)
-sys_int = tf([K_tilde(3)],[1 0])
+sys_int = tf([K_tilde(4)],[1 0])
 sys_int_d = c2d(sys_int,Ts,'tustin')
-
+num = tfdata(sys_int_d)
+num_int = -num{1}
 
 %% Approssimazione di Padè in ss
 
