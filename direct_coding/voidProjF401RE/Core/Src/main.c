@@ -38,7 +38,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define WAITING 2 // the number of seconds to wait from one reference change to the next. It also coincides with the number of seconds between one USART send and the next
+#define WAITING 30 // the number of seconds to wait from one reference change to the next. It also coincides with the number of seconds between one USART send and the next
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -221,7 +221,7 @@ double u_last_integrated = 0;
 double u_last = 0;
 double e_last = 0;
 double Ts = 0.005;
-double referenceVals[8] = { 3.14, 1.57, -3.14, -1.57, 3.14, 1.57, -3.14, -1.57 };
+double referenceVals[8] = { 3.14, 1.54, 3.14, 1.54, 3.14, 1.54, 3.14, 1.54 };
 double referenceVal;
 uint32_t k_controller = -1;
 int samplingPrescaler = 2;
@@ -230,74 +230,113 @@ int samplingPrescalerCounter = 0;
 double ticksStar = 0; 
 
 typedef struct controller_gains{
-	double K1 = 2.8533651377751847;
-	double K2 =  25.840304667836726;
-	double K3 = 0.70305257229905194;
-	double KI = 0.00883883476483182; // This comes from the discretization of the integral part of the controller. KI = 4.6009096074749376
-	double Kr = 4.6009096074749376;
+	double K1;
+	double K2;
+	double K3;
+	double KI;
+	double Kr;
 } controller_gains;
 
+controller_gains controller_gain = {
+	.K1 = 2.8533651377751847,
+	.K2 = 25.840304667836726,
+	.K3 = 0.70305257229905194,
+	.KI = 0.00883883476483182,
+	.Kr = 4.6009096074749376
+};
+
 typedef struct observer_A_s{
-	double A11 =  0.9323301716064688;
-	double A12 = -11.678660637721487;
-	double A13 = 0.039014496138124237;
-	double A21 = 0.0027413091396064947;
-	double A22 = 0.1183557159613379;
-	double A23 = 5.5348095481874759E-5;
-	double A31 = -0.0068954979109303533;
-	double A32 = -2.8131155992845822;
-	double A33 = 0.8383381318909956;
-} observer_A;
+	double A11;
+	double A12;
+	double A13;
+	double A21;
+	double A22;
+	double A23;
+	double A31;
+	double A32;
+	double A33;
+} observer_A_t;
+
+observer_A_t observer_A = {
+	.A11 = 0.9323301716064688,
+	.A12 = -11.678660637721487,
+	.A13 = 0.039014496138124237,
+	.A21 = 0.0027413091396064947,
+	.A22 = 0.1183557159613379,
+	.A23 = 5.5348095481874759E-5,
+	.A31 = -0.0068954979109303533,
+	.A32 = -2.8131155992845822,
+	.A33 = 0.8383381318909956
+};
 
 
 typedef struct observer_B_s{
-	double B11 = -0.0040505355062536866;
-	double B12 = 2.0794225090756346;
-	double B21 = -5.7463109393787418E-6;
-	double B22 = 0.15697955665449895;
-	double B31 = 0.036784001382597235;
-	double B32 = 0.50088414067706177;
-} observer_B;
+	double B11;
+	double B12;
+	double B21;
+	double B22;
+	double B31;
+	double B32;
+} observer_B_t;
+
+observer_B_t observer_B = {
+	.B11 = -0.0040505355062536866,
+	.B12 = 2.0794225090756346,
+	.B21 = -5.7463109393787418E-6,
+	.B22 = 0.15697955665449895,
+	.B31 = 0.036784001382597235,
+	.B32 = 0.50088414067706177
+};
 
 typedef struct observer_C_s{
-	double C11 = 0.96616508580323435;
-	double C12 = -5.8393303188607444;
-	double C13 = 0.019507248069062118;
-	double C21 = 0.0013706545698032474;
-	double C22 = 0.559177857980669;
-	double C23 = 2.767404774093738E-5;
-	double C31 = -0.0034477489554651771;
-	double C32 = -1.4065577996422911;
-	double C33 = 0.91916906594549774;
-} observer_C;
+	double C11;
+	double C12;
+	double C13;
+	double C21;
+	double C22;
+	double C23;
+	double C31;
+	double C32;
+	double C33;
+} observer_C_t;
+
+observer_C_t observer_C = {
+	.C11 = 0.96616508580323435,
+	.C12 = -5.8393303188607444,
+	.C13 = 0.019507248069062118,
+	.C21 = 0.0013706545698032474,
+	.C22 = 0.559177857980669,
+	.C23 = 2.767404774093738E-5,
+	.C31 = -0.0034477489554651771,
+	.C32 = -1.4065577996422911,
+	.C33 = 0.91916906594549774
+};
 
 typedef struct observer_D_s{
-	double D11 = -0.0020252677531268433;
-	double D12 = 1.0397112545378173;
-	double D21 = -2.8731554696893709E-6;
-	double D22 = 0.078489778327249474;
-	double D31 = 0.018392000691298618;
-	double D32 = 0.25044207033853089;
-} observer_D;
+	double D11;
+	double D12;
+	double D21;
+	double D22;
+	double D31;
+	double D32;
+} observer_D_t;
 
-// Instantiate the observer matrices
-observer_A observerA;
-observer_B observerB;
-observer_C observerC;
-observer_D observerD;
-controller_gains controller_gain;
-
+observer_D_t observer_D = {
+	.D11 = -0.0020252677531268433,
+	.D12 = 1.0397112545378173,
+	.D21 = -2.8731554696893709E-6,
+	.D22 = 0.078489778327249474,
+	.D31 = 0.018392000691298618,
+	.D32 = 0.25044207033853089
+};
 typedef struct x_hat_s {
-	double x1 = 0;
-	double x2 = 0;
-	double x3 = 0;
+	double x1;
+	double x2;
+	double x3;
 } x_hat_t;
 
-x_hat_t observer_state = {0,0,0};
+x_hat_t observer_state = {0, 0, 0};
 
-{
-	/* data */
-};
 
 
 /* USER CODE END 0 */
@@ -615,13 +654,13 @@ static void MX_GPIO_Init(void) {
 }
 
 /* USER CODE BEGIN 4 */
-x_hat_t get_x_hat(double u_last, double y) {
+x_hat_t get_x_hat(double u_last, double y_now) {
 	double x1 = observer_state.x1;
 	double x2 = observer_state.x2;
 	double x3 = observer_state.x3;
 
 	double u = u_last;
-	double y = y;
+	double y = y_now;
 
 	x_hat_t state_estimated = {0,0,0}; 
 
@@ -675,7 +714,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		// recording data in the buffer
 		record r;
 		r.current_u = u;
-		r.current_y = speed;
+		r.current_y = position;
 		r.cycleCoreDuration = controlComputationDuration;
 		r.cycleBeginDelay = tocControlStep - ticControlStep
 				- (k_controller * Ts * 1000);
