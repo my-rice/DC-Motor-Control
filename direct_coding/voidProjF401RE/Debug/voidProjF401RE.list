@@ -39,13 +39,13 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY, DEBUGGING, OCTETS
  17 .debug_line   0000e1d4  00000000  00000000  00031167  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 18 .debug_str    000905c8  00000000  00000000  0003f33b  2**0
+ 18 .debug_str    000905e4  00000000  00000000  0003f33b  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 19 .comment      00000043  00000000  00000000  000cf903  2**0
+ 19 .comment      00000043  00000000  00000000  000cf91f  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000046f0  00000000  00000000  000cf948  2**2
+ 20 .debug_frame  000046f0  00000000  00000000  000cf964  2**2
                   CONTENTS, READONLY, DEBUGGING, OCTETS
- 21 .debug_line_str 0000007e  00000000  00000000  000d4038  2**0
+ 21 .debug_line_str 0000009b  00000000  00000000  000d4054  2**0
                   CONTENTS, READONLY, DEBUGGING, OCTETS
 
 Disassembly of section .text:
@@ -2044,28 +2044,29 @@ int main(void) {
  800153a:	2104      	movs	r1, #4
  800153c:	482a      	ldr	r0, [pc, #168]	@ (80015e8 <main+0x128>)
  800153e:	f002 f9a1 	bl	8003884 <HAL_TIM_PWM_Start>
+
+	int referenceIndex = 0;
+ 8001542:	2300      	movs	r3, #0
+ 8001544:	62fb      	str	r3, [r7, #44]	@ 0x2c
+
+	referenceVal = referenceVals[referenceIndex];
+ 8001546:	4a29      	ldr	r2, [pc, #164]	@ (80015ec <main+0x12c>)
+ 8001548:	6afb      	ldr	r3, [r7, #44]	@ 0x2c
+ 800154a:	00db      	lsls	r3, r3, #3
+ 800154c:	4413      	add	r3, r2
+ 800154e:	e9d3 2300 	ldrd	r2, r3, [r3]
+ 8001552:	4927      	ldr	r1, [pc, #156]	@ (80015f0 <main+0x130>)
+ 8001554:	e9c1 2300 	strd	r2, r3, [r1]
 	HAL_TIM_Base_Start(&htim1);
- 8001542:	482a      	ldr	r0, [pc, #168]	@ (80015ec <main+0x12c>)
- 8001544:	f002 f888 	bl	8003658 <HAL_TIM_Base_Start>
+ 8001558:	4826      	ldr	r0, [pc, #152]	@ (80015f4 <main+0x134>)
+ 800155a:	f002 f87d 	bl	8003658 <HAL_TIM_Base_Start>
 	HAL_TIM_Base_Start_IT(&htim4);
- 8001548:	4829      	ldr	r0, [pc, #164]	@ (80015f0 <main+0x130>)
- 800154a:	f002 f8df 	bl	800370c <HAL_TIM_Base_Start_IT>
+ 800155e:	4826      	ldr	r0, [pc, #152]	@ (80015f8 <main+0x138>)
+ 8001560:	f002 f8d4 	bl	800370c <HAL_TIM_Base_Start_IT>
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
-	int referenceIndex = 0;
- 800154e:	2300      	movs	r3, #0
- 8001550:	62fb      	str	r3, [r7, #44]	@ 0x2c
-
-	referenceVal = referenceVals[referenceIndex];
- 8001552:	4a28      	ldr	r2, [pc, #160]	@ (80015f4 <main+0x134>)
- 8001554:	6afb      	ldr	r3, [r7, #44]	@ 0x2c
- 8001556:	00db      	lsls	r3, r3, #3
- 8001558:	4413      	add	r3, r2
- 800155a:	e9d3 2300 	ldrd	r2, r3, [r3]
- 800155e:	4926      	ldr	r1, [pc, #152]	@ (80015f8 <main+0x138>)
- 8001560:	e9c1 2300 	strd	r2, r3, [r1]
 	printf("INIT\n\r"); // initialize the Matlab tool for COM data acquiring
  8001564:	4825      	ldr	r0, [pc, #148]	@ (80015fc <main+0x13c>)
  8001566:	f004 fa99 	bl	8005a9c <iprintf>
@@ -2110,19 +2111,19 @@ int main(void) {
 					retrieved.cycleCoreDuration); // send values via USART using format: value1, value2, value3, ... valuen \n \r
 		}
 		referenceVal = referenceVals[referenceIndex];
- 80015ac:	4a11      	ldr	r2, [pc, #68]	@ (80015f4 <main+0x134>)
+ 80015ac:	4a0f      	ldr	r2, [pc, #60]	@ (80015ec <main+0x12c>)
  80015ae:	6afb      	ldr	r3, [r7, #44]	@ 0x2c
  80015b0:	00db      	lsls	r3, r3, #3
  80015b2:	4413      	add	r3, r2
  80015b4:	e9d3 2300 	ldrd	r2, r3, [r3]
- 80015b8:	490f      	ldr	r1, [pc, #60]	@ (80015f8 <main+0x138>)
+ 80015b8:	490d      	ldr	r1, [pc, #52]	@ (80015f0 <main+0x130>)
  80015ba:	e9c1 2300 	strd	r2, r3, [r1]
 		referenceIndex = referenceIndex + 1;
  80015be:	6afb      	ldr	r3, [r7, #44]	@ 0x2c
  80015c0:	3301      	adds	r3, #1
  80015c2:	62fb      	str	r3, [r7, #44]	@ 0x2c
 		HAL_Delay(WAITING*1000); // takes a time value in ms
- 80015c4:	f247 5030 	movw	r0, #30000	@ 0x7530
+ 80015c4:	f241 3088 	movw	r0, #5000	@ 0x1388
  80015c8:	f001 f8ca 	bl	8002760 <HAL_Delay>
 		if (referenceIndex > 7)
  80015cc:	6afb      	ldr	r3, [r7, #44]	@ 0x2c
@@ -2135,13 +2136,13 @@ int main(void) {
  80015d6:	e7c8      	b.n	800156a <main+0xaa>
  80015d8:	2000004c 	.word	0x2000004c
  80015dc:	20000000 	.word	0x20000000
- 80015e0:	404e0000 	.word	0x404e0000
+ 80015e0:	40240000 	.word	0x40240000
  80015e4:	20000478 	.word	0x20000478
  80015e8:	200003a4 	.word	0x200003a4
- 80015ec:	2000035c 	.word	0x2000035c
- 80015f0:	200003ec 	.word	0x200003ec
- 80015f4:	20000008 	.word	0x20000008
- 80015f8:	200004d0 	.word	0x200004d0
+ 80015ec:	20000008 	.word	0x20000008
+ 80015f0:	200004d0 	.word	0x200004d0
+ 80015f4:	2000035c 	.word	0x2000035c
+ 80015f8:	200003ec 	.word	0x200003ec
  80015fc:	08007be0 	.word	0x08007be0
  8001600:	08007be8 	.word	0x08007be8
 

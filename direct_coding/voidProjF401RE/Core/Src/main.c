@@ -38,7 +38,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define WAITING 30 // the number of seconds to wait from one reference change to the next. It also coincides with the number of seconds between one USART send and the next
+#define WAITING 5 // the number of seconds to wait from one reference change to the next. It also coincides with the number of seconds between one USART send and the next
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -221,7 +221,7 @@ double u_last_integrated = 0;
 double u_last = 0;
 double e_last = 0;
 double Ts = 0.005;
-double referenceVals[8] = { 3.14, 1.54, 3.14, 1.54, 3.14, 1.54, 3.14, 1.54 };
+double referenceVals[8] = { 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14 };
 double referenceVal;
 uint32_t k_controller = -1;
 int samplingPrescaler = 2;
@@ -374,15 +374,16 @@ int main(void) {
 	/* USER CODE BEGIN 2 */
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
+
+	int referenceIndex = 0;
+
+	referenceVal = referenceVals[referenceIndex];
 	HAL_TIM_Base_Start(&htim1);
 	HAL_TIM_Base_Start_IT(&htim4);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
-	int referenceIndex = 0;
-
-	referenceVal = referenceVals[referenceIndex];
 	printf("INIT\n\r"); // initialize the Matlab tool for COM data acquiring
 
 	while (1) {
