@@ -6,6 +6,32 @@ s=tf('s')
 %% Filter signal
 % With 10 seconds, and Ts = 0.005 we have 2000 samples, so 20 windowSize
 % means is equal to 1.5%
+
+% Filter parameters
+T = Ts; % Sampling period (assume 1 for simplicity, adjust as needed)
+tau = 10*Ts; % Time constant of the lag filter
+
+% First order lag filter coefficient
+alpha = T / (T + tau);
+
+% Initialize the filtered signal array
+filtered_signal = zeros(size(y));
+
+% Apply the first order lag filter
+for k = 2:length(y)
+    filtered_signal(k) = alpha * y(k) + (1 - alpha) * filtered_signal(k-1);
+end
+% Plot the results for visualization
+figure;
+plot(y, '-o');
+hold on;
+plot(filtered_signal, '-x');
+legend('Original y', 'Filtered Signal');
+xlabel('Sample Index');
+ylabel('Amplitude');
+title('First Order Lag Filter');
+grid on;
+%%
 windowSize = 30
 b=(1/windowSize)*ones(1,windowSize)
 a = 1
