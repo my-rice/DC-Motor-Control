@@ -139,6 +139,9 @@ typedef struct record {
 	uint32_t cycleCoreDuration; // time needed to read, compute and actuate
 	uint32_t cycleBeginDelay; // difference between the actual and the expected absolute start time of the cycle
 	uint32_t currentTimestamp; // current timestamp in millis
+	double current_tick;
+	double reference;
+	double last_tick;
 } record;
 
 /* BEGIN USART WRITE FUNCTION (used by printf)*/
@@ -175,41 +178,25 @@ void setPulseFromDutyValue(double dutyVal) {
 			(abs(dutyVal) * ((double )htim3.Init.Period)) / 100); //cast integer value to double to correctly perform division between decimal numbers
 }
 
-double getSpeedByDelta(double ticksDelta, double Ts) {
-	return ticksDelta * 60 / (8400 * Ts);
+double getSpeedByDelta(double ticksDelta) {
+	return ticksDelta * 60 / (8400 * 0.005);
 }
 
-double getTicksDelta(double currentTicks, double lastTicks, double Ts) {
+double getTicksDelta(double ticks, double last) {
 	double delta;
 
-	if (abs(currentTicks - lastTicks) <= ceil(12600 * Ts))
-		delta = currentTicks - lastTicks;
+	if (abs(ticks - last) <= ceil(12600 * 0.005))
+		delta = ticks - last;
 	else {
-		if (lastTicks > currentTicks)
-			delta = currentTicks + pow(2, 16) - 1 - lastTicks;
+		if (last > ticks)
+			delta = ticks + pow(2, 16) - 1 - last;
 		else
-			delta = currentTicks - pow(2, 16) + 1 - lastTicks;
+			delta = ticks - pow(2, 16) + 1 - last;
 	}
 	return delta;
 }
 
-double sign(double x) {
-	if (x > 0)
-		return 1;
-	else if (x < 0)
-		return -1;
-	else
-		return 0;
-}
 
-
-double getPositionByDelta(double ticksDelta, double* ticksStar) {
-	// 
-	*ticksStar = *ticksStar + (double)ticksDelta;
-	double completeTheta = 2*3.14159265359*(*ticksStar/8400);
-	double position=sign(completeTheta)*fmod(completeTheta,2*3.14159265359);
-	return position;
-}
 
 int cycleduration;
 double lastTicks = 0;
@@ -221,7 +208,7 @@ double u_last_integrated = 0;
 double u_last = 0;
 double e_last = 0;
 double Ts = 0.005;
-double referenceVals[8] = { 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14 };
+double referenceVals[8] = { 3.14, 1.57, 3.14, 1.57, 3.14, 1.57, 3.14, 1.57};
 double referenceVal;
 uint32_t k_controller = -1;
 int samplingPrescaler = 2;
@@ -338,6 +325,22 @@ typedef struct x_hat_s {
 x_hat_t observer_state = {0, 0, 0};
 
 
+double sign(double x) {
+	if (x >= 0)
+		return 1;
+	else
+		return -1;
+}
+
+
+double getPositionByDelta(double ticksDelta) {
+	//
+	ticksStar = ticksStar + (double)ticksDelta;
+	double completeTheta = 2*3.14159265359*(ticksStar/8400);
+	double position=sign(completeTheta)*fmod(completeTheta,2*3.14159265359);
+	return position;
+}
+
 
 /* USER CODE END 0 */
 
@@ -378,13 +381,14 @@ int main(void) {
 	int referenceIndex = 0;
 
 	referenceVal = referenceVals[referenceIndex];
+	HAL_Delay(2000);
+	printf("INIT\n\r"); // initialize the Matlab tool for COM data acquiring
 	HAL_TIM_Base_Start(&htim1);
 	HAL_TIM_Base_Start_IT(&htim4);
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
 	/* USER CODE BEGIN WHILE */
-	printf("INIT\n\r"); // initialize the Matlab tool for COM data acquiring
 
 	while (1) {
 		size_t nEntriesToSend = myBuff.count; //number of samples not read yet
@@ -392,9 +396,9 @@ int main(void) {
 
 		for (size_t count = 0; count < nEntriesToSend; count++) {
 			cb_pop_front(&myBuff, &retrieved); //take entry from the buffer
-			printf("%lu, %f, %f, %lu\n\r", retrieved.currentTimestamp,
+			printf("%lu, %f, %f, %lu, %f, %f, %f\n\r", retrieved.currentTimestamp,
 					retrieved.current_u, retrieved.current_y,
-					retrieved.cycleCoreDuration); // send values via USART using format: value1, value2, value3, ... valuen \n \r
+					retrieved.cycleCoreDuration, retrieved.current_tick, retrieved.last_tick,retrieved.reference); // send values via USART using format: value1, value2, value3, ... valuen \n \r
 		}
 		referenceVal = referenceVals[referenceIndex];
 		referenceIndex = referenceIndex + 1;
@@ -691,10 +695,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 		currentTicks = (double) __HAL_TIM_GET_COUNTER(&htim1); //take current value of ticks counting the encoder edges
 		// double speed = getSpeedByDelta(
-		// 		getTicksDelta(currentTicks, lastTicks, Ts), Ts);
+		// 		getTicksDelta(currentTicks, lastTicks));
 
 		double position = getPositionByDelta(
-				getTicksDelta(currentTicks, lastTicks, Ts), &ticksStar);
+				getTicksDelta(currentTicks, lastTicks));
 
 		// double e = referenceVal - speed;
 		double e = referenceVal - position;
@@ -711,11 +715,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		e_last = e;
 
 		controlComputationDuration = HAL_GetTick() - tocControlStep;
+		double temp = lastTicks;
 		lastTicks = currentTicks;
 		// recording data in the buffer
 		record r;
 		r.current_u = u;
 		r.current_y = position;
+		r.last_tick = temp;
+		r.reference = referenceVal;
+		r.current_tick = currentTicks;
 		r.cycleCoreDuration = controlComputationDuration;
 		r.cycleBeginDelay = tocControlStep - ticControlStep
 				- (k_controller * Ts * 1000);
