@@ -381,6 +381,7 @@ int main(void) {
 	int referenceIndex = 0;
 
 	referenceVal = referenceVals[referenceIndex];
+	printf("INIT\n\r"); // initialize the Matlab tool for COM data acquiring
 	HAL_Delay(2000);
 	printf("INIT\n\r"); // initialize the Matlab tool for COM data acquiring
 	HAL_TIM_Base_Start(&htim1);
