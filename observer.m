@@ -1,20 +1,19 @@
-A = [-7.9641 0 8.7857; 1.0000 0 0; 0 0 -35.1427];
-B = [-1;0;8];
-C = [0, 5.6163, 0];
-D = 0;
+%% WARNING! Execute this code after model_approximation.m to store the variables in the workspace (A,B,C,D)
+%% Observability test
+W0 = [C;C*A;C*A^2]; % observability matrix
+if(rank(W0)==3)
+    disp("The system is observable!")
+else
+   disp("The system is not observable!")
+end
 
-%K_tilde = [1.9673   17.3897    0.4808   -2.3973];
-%kr = -1/(C*inv(A-B*K_tilde(1:3))*B);
-
-%
-W0 = [C;C*A;C*A^2];
-rank(W0)
-
-% calcolo dei coefficienti del polinomio desiderato
-Sett_time = 0.2;
-zeta = 1;
-w0 = 5.8/Sett_time;
-p = -w0*zeta*10;
+%% Using the pole dominant approximation to set the desired performance of observer dynamic system
+Sett_time = 0.2; % faster then the motor model
+zeta = 1; % no oscillations
+w0 = 5.8/Sett_time; % took from the step response properties of a second 
+% order system
+p = -w0*zeta*10; % one of the three poles is placed in high frequency (10 
+% times higher than the other two poles)
 
 syms s l1 l2 l3
 L = [l1;l2;l3];
@@ -26,33 +25,9 @@ sol = solve(pol_coeff==desired_pol_coeff,[l1, l2, l3],"ReturnConditions",true);
 l1 = eval(sol.l1)
 l2 = eval(sol.l2)
 l3 = eval(sol.l3)
-L = [l1;l2;l3];
-%% Discretizzazione
-
+L = [l1;l2;l3]; 
+% In this block of code, using the polinomial equivalence with closed loop
+% matrix of the observer, the L poles values are computed
+%% Discretize the observer 
 sys_continuos = ss(A-L*C,[B L],eye(3),[0 0; 0 0; 0 0])
 sys_discrete = c2d(sys_continuos,0.005,'tustin')
-
-% L = inv(W0)*W0_tilde*[pd1-a1;pd2-a2];
-% L = eval(L);
-
-% % matrice di osservabilità in forma canonica
-% syms x 
-% polyA = charpoly(A,x)
-% polyA = coeffs(polyA)
-% a1 = polyA(2);
-% a2 = polyA(1);
-% a3 = 0;
-% W0_tilde = inv([1,0,0;a1,1,0;a2,a1,1]); %in alternativa W0_tilde = [1 0;-a1 1];
-
-% % calcolo dei coefficienti del polinomio desiderato
-
-
-
-% pd1 = 2*zeta*w0;
-% pd2 = w0^2;
-
-% L = inv(W0)*W0_tilde*[pd1-a1;pd2-a2];
-% L = eval(L);
-
-
-
