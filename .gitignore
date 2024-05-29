@@ -7,3 +7,7 @@ tuning_ert_rtw/*
 *.bin
 *.asv
 PIL_motore_ert_rtw/*
+
+Tuning_L_ert_rtw/*
+*/*_ert_rtw/*
+*/slprj/*

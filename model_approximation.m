@@ -4,8 +4,8 @@ clc
 
 %% Definition of sampling time and input/output signal retrieved from the motor
 Ts = 0.005;
-y = load('motor_data/y_motore.mat').y;
-t = load('motor_data/t_motore.mat').t;
+y = load('motor_data/y_davide2.mat').y;
+t = load('motor_data/t_davide2.mat').t;
 u(1) = 12;
 
 %% Filter signal using first order lag filter
