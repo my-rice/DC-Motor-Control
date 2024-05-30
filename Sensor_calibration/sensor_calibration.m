@@ -1,12 +1,12 @@
 % Load the data from the file
-y = load('analog_0Amp.mat');
+y = load('Sensor_0Ampere.mat');
 
 % Get the time and the data
 t = y.data.Time;
 y = y.data.Data(:,:);
 
-Vref = 3.3;
-y = y*Vref;
+%Vref = 3.3;
+%y = y*Vref;
 
 % get the average value of the sensor output
 y_avg = mean(y);
