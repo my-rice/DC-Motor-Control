@@ -80,3 +80,7 @@ A = sys_pade.A
 B = sys_pade.B
 C = sys_pade.C
 D = sys_pade.D
+
+%% Discretize for SIL/PIL 
+sys_continuos_motor = ss(A,B,C,D)
+sys_discrete_motor = c2d(sys_continuos_motor,0.005,'tustin')
