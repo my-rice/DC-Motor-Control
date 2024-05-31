@@ -38,7 +38,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define WAITING 5 // the number of seconds to wait from one reference change to the next. It also coincides with the number of seconds between one USART send and the next
+#define WAITING 4 // the number of seconds to wait from one reference change to the next. It also coincides with the number of seconds between one USART send and the next
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -208,12 +208,14 @@ double u_last_integrated = 0;
 double u_last = 0;
 double e_last = 0;
 double Ts = 0.005;
-double referenceVals[8] = { 3.14, 1.57, 3.14, 1.57, 3.14, 1.57, 3.14, 1.57};
+double referenceVals[10] = { 10, 10, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14};
 double referenceVal;
+int referenceIndex = 0;
+int control_step_counter = 0;
 uint32_t k_controller = -1;
 int samplingPrescaler = 2;
 int samplingPrescalerCounter = 0;
-
+double z_antiwindup_last = 0;
 double ticksStar = 0; 
 
 typedef struct controller_gains{
@@ -357,7 +359,7 @@ int main(void) {
 	HAL_Init();
 
 	/* USER CODE BEGIN Init */
-	size_t bufferSize = (size_t)ceil(2 * WAITING / (Ts * samplingPrescaler));
+	size_t bufferSize = (size_t)ceil(4 * WAITING / (Ts * samplingPrescaler));
 	cb_init(&myBuff, bufferSize, sizeof(record));
 
 	/* USER CODE END Init */
@@ -378,11 +380,9 @@ int main(void) {
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
 	HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 
-	int referenceIndex = 0;
-
 	referenceVal = referenceVals[referenceIndex];
 	printf("INIT\n\r"); // initialize the Matlab tool for COM data acquiring
-	HAL_Delay(2000);
+	HAL_Delay(1000);
 	printf("INIT\n\r"); // initialize the Matlab tool for COM data acquiring
 	HAL_TIM_Base_Start(&htim1);
 	HAL_TIM_Base_Start_IT(&htim4);
@@ -397,15 +397,15 @@ int main(void) {
 
 		for (size_t count = 0; count < nEntriesToSend; count++) {
 			cb_pop_front(&myBuff, &retrieved); //take entry from the buffer
-			printf("%lu, %f, %f, %lu, %f, %f, %f\n\r", retrieved.currentTimestamp,
+			printf("%Lf, %f, %f, %lu, %f, %f, %f\n\r", (long double)retrieved.currentTimestamp*Ts*0.2,
 					retrieved.current_u, retrieved.current_y,
 					retrieved.cycleCoreDuration, retrieved.current_tick, retrieved.last_tick,retrieved.reference); // send values via USART using format: value1, value2, value3, ... valuen \n \r
 		}
-		referenceVal = referenceVals[referenceIndex];
-		referenceIndex = referenceIndex + 1;
+		//referenceVal = referenceVals[referenceIndex];
+		//referenceIndex = referenceIndex + 1;
 		HAL_Delay(WAITING*1000); // takes a time value in ms
-		if (referenceIndex > 7)
-			referenceIndex = 0;
+		//if (referenceIndex > 10)
+		//	referenceIndex = 0;
 
 		/* USER CODE END WHILE */
 
@@ -689,6 +689,7 @@ x_hat_t get_x_hat(double u_last, double y_now) {
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &htim4) {
 		k_controller = k_controller + 1;
+		control_step_counter += 1;
 		if (k_controller == 0) {
 			ticControlStep = HAL_GetTick();
 		}
@@ -697,6 +698,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		currentTicks = (double) __HAL_TIM_GET_COUNTER(&htim1); //take current value of ticks counting the encoder edges
 		// double speed = getSpeedByDelta(
 		// 		getTicksDelta(currentTicks, lastTicks));
+
+		if(control_step_counter % (int)((int)WAITING/Ts) == 0){
+			referenceIndex = referenceIndex + 1;
+			if (referenceIndex >= 10)
+				referenceIndex = 0;
+			referenceVal = referenceVals[referenceIndex];
+		}
 
 		double position = getPositionByDelta(
 				getTicksDelta(currentTicks, lastTicks));
@@ -707,8 +715,19 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		x_hat_t state_estimated = get_x_hat(u_last, position);
 
 		double u = -controller_gain.K1 * state_estimated.x1 - controller_gain.K2 * state_estimated.x2 - controller_gain.K3 * state_estimated.x3 + controller_gain.Kr * referenceVal;
-		double u_integrator = u_last_integrated + controller_gain.KI *(e + e_last);
+
+
+		double z_q_gamma = controller_gain.KI*(e +  e_last);
+		double u_integrator = z_antiwindup_last + z_q_gamma;
+
+		if(u_integrator > 12){
+			u_integrator = 12;
+		}else if(u_integrator < -12){
+			u_integrator = -12;
+		}
+		z_antiwindup_last = u_integrator;
 		u += u_integrator;
+
 		setPulseFromDutyValue(u * 100 / 12);
 
 		u_last_integrated = u_integrator;
