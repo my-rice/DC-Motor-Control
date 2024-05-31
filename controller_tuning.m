@@ -23,3 +23,14 @@ sys_int = tf([K_tilde(4)],[1 0])
 sys_int_d = c2d(sys_int,Ts,'tustin')
 num = tfdata(sys_int_d)
 num_int = -num{1}
+
+%% Anti wind-up
+
+[Q_vec,P_vec] = tfdata(sys_int_d,'v');
+Q_vec = -Q_vec
+Gamma_vec = [1 0];
+
+z_Q_Gamma = tf(Q_vec,Gamma_vec,Ts);
+
+z_antiwindupFunc = tf(Gamma_vec-P_vec,Gamma_vec,Ts);
+
