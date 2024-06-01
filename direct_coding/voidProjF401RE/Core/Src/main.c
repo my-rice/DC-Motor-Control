@@ -208,7 +208,7 @@ double u_last_integrated = 0;
 double u_last = 0;
 double e_last = 0;
 double Ts = 0.005;
-double referenceVals[10] = { 10, 10, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14, 3.14};
+double referenceVals[10] = { 10, 10, 3.14, 2, -10, -10, -10, -10, -10, -10};
 double referenceVal;
 int referenceIndex = 0;
 int control_step_counter = 0;
@@ -338,8 +338,7 @@ double sign(double x) {
 double getPositionByDelta(double ticksDelta) {
 	//
 	ticksStar = ticksStar + (double)ticksDelta;
-	double completeTheta = 2*3.14159265359*(ticksStar/8400);
-	double position=sign(completeTheta)*fmod(completeTheta,2*3.14159265359);
+	double position = 2*3.14159265359*(ticksStar/8400);
 	return position;
 }
 

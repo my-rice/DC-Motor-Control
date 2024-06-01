@@ -9,7 +9,7 @@ end
 %% LQI implementation and tuning of the matrices
 Q = [0.01 0 0 0; 0 15 0 0; 0 0 0.01 0; 0 0 0 1] % definition of the matrix
 % that weights the states
-R =  0.08 % definition of the matrix that weights the input
+R =  0.05 % definition of the matrix that weights the input
 [K_tilde,S,e] = lqi(ss(A,B,C,D),Q,R,0) % the lqi function return the values
 % for the gains of the state feedback controllore, the last one is of a
 % different sign, because the MATLAB lqi function, compute the error as:
