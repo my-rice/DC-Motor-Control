@@ -60,8 +60,8 @@ all: main-build
 main-build: TorqueController.elf secondary-outputs
 
 # Tool invocations
-TorqueController.elf TorqueController.map: $(OBJS) $(USER_OBJS) C:\Users\david\STM32CubeIDE\workspace_1.15.0\TorqueController\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "TorqueController.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\david\STM32CubeIDE\workspace_1.15.0\TorqueController\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TorqueController.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+TorqueController.elf TorqueController.map: $(OBJS) $(USER_OBJS) C:\Users\david\Desktop\Embedded\ Digital\ Controllers\Embedded_Controller_project\direct_coding\TorqueController\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "TorqueController.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\david\Desktop\Embedded Digital Controllers\Embedded_Controller_project\direct_coding\TorqueController\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="TorqueController.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
