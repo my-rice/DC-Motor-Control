@@ -9,8 +9,8 @@ t = load('motor_data/t_motore.mat').t;
 u(1) = 12;
 
 %% Filter signal 
-% With 10 seconds, and Ts = 0.005 we have 2000 samples, so 20 windowSize
-% means is equal to 1.5%
+% With 10 seconds, and Ts = 0.005 we have 2000 samples, so 29 windowSize
+% means is equal to 1.5% TODO RISCRIVERE
 windowSize = 29
 b=(1/windowSize)*ones(1,windowSize)
 a = 1

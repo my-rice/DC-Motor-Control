@@ -139,9 +139,9 @@ typedef struct record {
 	uint32_t cycleCoreDuration; // time needed to read, compute and actuate
 	uint32_t cycleBeginDelay; // difference between the actual and the expected absolute start time of the cycle
 	uint32_t currentTimestamp; // current timestamp in millis
-	double current_tick;
-	double reference;
-	double last_tick;
+	double current_tick; // current encoder tick
+	double reference; // reference value
+	double last_tick; // last encoder tick
 } record;
 
 /* BEGIN USART WRITE FUNCTION (used by printf)*/
@@ -247,15 +247,15 @@ typedef struct observer_A_s{
 } observer_A_t;
 
 observer_A_t observer_A = {
-	.A11 = 0.9323301716064688,
-	.A12 = -11.678660637721487,
-	.A13 = 0.039014496138124237,
-	.A21 = 0.0027413091396064947,
-	.A22 = 0.1183557159613379,
-	.A23 = 5.5348095481874759E-5,
-	.A31 = -0.0068954979109303533,
-	.A32 = -2.8131155992845822,
-	.A33 = 0.8383381318909956
+	.A11 = 0.931605363824459,
+	.A12 = -11.346656884140103,
+	.A13 = 0.039099543321700,
+	.A21 = 0.002741925544432,
+	.A22 = 0.119498209981127,
+	.A23 = 5.550203919352659e-05,
+	.A31 = -0.007094455468349,
+	.A32 = -2.896588572120294,
+	.A33 = 0.837920445653216
 };
 
 
@@ -269,12 +269,12 @@ typedef struct observer_B_s{
 } observer_B_t;
 
 observer_B_t observer_B = {
-	.B11 = -0.0040505355062536866,
-	.B12 = 2.0794225090756346,
-	.B21 = -5.7463109393787418E-6,
-	.B22 = 0.15697955665449895,
-	.B31 = 0.036784001382597235,
-	.B32 = 0.50088414067706177
+	.B11 = -0.004047022543127,
+	.B12 = 1.941673905307397,
+	.B21 = -5.744773077210588e-06,
+	.B22 = 0.150674103104834,
+	.B31 = 0.036776145051735,
+	.B32 = 0.495672910737163
 };
 
 typedef struct observer_C_s{
@@ -290,15 +290,15 @@ typedef struct observer_C_s{
 } observer_C_t;
 
 observer_C_t observer_C = {
-	.C11 = 0.96616508580323435,
-	.C12 = -5.8393303188607444,
-	.C13 = 0.019507248069062118,
-	.C21 = 0.0013706545698032474,
-	.C22 = 0.559177857980669,
-	.C23 = 2.767404774093738E-5,
-	.C31 = -0.0034477489554651771,
-	.C32 = -1.4065577996422911,
-	.C33 = 0.91916906594549774
+	.C11 = 0.965802681912229,
+	.C12 = -5.673328442070051,
+	.C13 = 0.019549771660850,
+	.C21 = 0.001370962772216,
+	.C22 = 0.559749104990563,
+	.C23 = 2.775101959676330e-05,
+	.C31 = -0.003547227734175,
+	.C32 = -1.448294286060147,
+	.C33 = 0.918960222826608
 };
 
 typedef struct observer_D_s{
@@ -311,13 +311,14 @@ typedef struct observer_D_s{
 } observer_D_t;
 
 observer_D_t observer_D = {
-	.D11 = -0.0020252677531268433,
-	.D12 = 1.0397112545378173,
-	.D21 = -2.8731554696893709E-6,
-	.D22 = 0.078489778327249474,
-	.D31 = 0.018392000691298618,
-	.D32 = 0.25044207033853089
+	.D11 = -0.002023511271564,
+	.D12 = 0.970836952653698,
+	.D21 = -2.872386538605294e-06,
+	.D22 = 0.075337051552417,
+	.D31 = 0.018388072525868,
+	.D32 = 0.247836455368581
 };
+
 typedef struct x_hat_s {
 	double x1;
 	double x2;
