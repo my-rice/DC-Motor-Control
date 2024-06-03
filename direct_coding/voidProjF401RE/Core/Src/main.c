@@ -208,7 +208,7 @@ double u_last_integrated = 0;
 double u_last = 0;
 double e_last = 0;
 double Ts = 0.005;
-double referenceVals[10] = { 10, 10, 3.14, 2, -10, -10, -10, -10, -10, -10};
+double referenceVals[10] = { 0, 3.14159265359, 3.14159265359/2, 2*3.14159265359, 3.14159265359, 2*3.14159265359, 0, 3.14159265359, 3.14159265359, 0};
 double referenceVal;
 int referenceIndex = 0;
 int control_step_counter = 0;
@@ -227,11 +227,11 @@ typedef struct controller_gains{
 } controller_gains;
 
 controller_gains controller_gain = {
-	.K1 = 2.8533651377751847,
-	.K2 = 25.840304667836726,
-	.K3 = 0.70305257229905194,
-	.KI = 0.00883883476483182,
-	.Kr = 4.6009096074749376
+	.K1 = 26.724886043281135,
+	.K2 = 3.066733303520890e+02,
+	.K3 = 8.782176686411950,
+	.KI = 0.079056941504208,
+	.Kr = 52.4788586698761706
 };
 
 typedef struct observer_A_s{
@@ -397,9 +397,9 @@ int main(void) {
 
 		for (size_t count = 0; count < nEntriesToSend; count++) {
 			cb_pop_front(&myBuff, &retrieved); //take entry from the buffer
-			printf("%Lf, %f, %f, %lu, %f, %f, %f\n\r", (long double)retrieved.currentTimestamp*Ts*0.2,
+			printf("%Lf, %f, %f, %lu, %f\n\r", (long double)retrieved.currentTimestamp*Ts*0.2,
 					retrieved.current_u, retrieved.current_y,
-					retrieved.cycleCoreDuration, retrieved.current_tick, retrieved.last_tick,retrieved.reference); // send values via USART using format: value1, value2, value3, ... valuen \n \r
+					retrieved.cycleCoreDuration,retrieved.reference); // send values via USART using format: value1, value2, value3, ... valuen \n \r
 		}
 		//referenceVal = referenceVals[referenceIndex];
 		//referenceIndex = referenceIndex + 1;
@@ -699,7 +699,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		// double speed = getSpeedByDelta(
 		// 		getTicksDelta(currentTicks, lastTicks));
 
-		if(control_step_counter % (int)((int)WAITING/Ts) == 0){
+		if(control_step_counter % (int)((int)WAITING*2/Ts) == 0){
 			referenceIndex = referenceIndex + 1;
 			if (referenceIndex >= 10)
 				referenceIndex = 0;
