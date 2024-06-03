@@ -34,34 +34,22 @@ z_antiwindupFunc = tf(Gamma_vec-P_vec,Gamma_vec,Ts);
 y = out.y;
 u = out.u;
 t = out.t;
-ref = out.r;
-ref = ref(:,:).';
-r = [];
-% create a reference signal with the same length as the output. r contains the reference signal and every 5 seconds the reference changes
-for i = 1:length(t)
-    if t(i) < 3
-        r(i) = ref(1);
-    elseif t(i) < 6
-        r(i) = ref(2);
-    else
-        r(i) = ref(3);
-    end
-end
-
-
+td = out.td;
+r = out.r(:,:).';
+r = r*ones(length(td),1);
 figure(1)
 plot(t,y)
 hold on
-plot(t,r)
+plot(td,r)
 hold off
-title('Torque')
+title('Torque with disturbance')
 xlabel('Time (s)')
 ylabel('Torque (N*m)')
 legend('Torque', 'Reference')
 
 figure(2)
-plot(t,u)
-title('Voltage')
+plot(td,u)
+title('Input Voltage')
 xlabel('Time (s)')
 ylabel('Voltage (V)')
-legend('Voltage')
+legend('Input Voltage')
