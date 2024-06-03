@@ -60,8 +60,8 @@ all: main-build
 main-build: voidProjF401RE.elf secondary-outputs
 
 # Tool invocations
-voidProjF401RE.elf voidProjF401RE.map: $(OBJS) $(USER_OBJS) C:\Users\giova\Desktop\Embedded_Controller_project\direct_coding\voidProjF401RE\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "voidProjF401RE.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\giova\Desktop\Embedded_Controller_project\direct_coding\voidProjF401RE\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="voidProjF401RE.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
+voidProjF401RE.elf voidProjF401RE.map: $(OBJS) $(USER_OBJS) C:\Users\giova\Desktop\Embedded_Controller_project-1\direct_coding\voidProjF401RE\STM32F401RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "voidProjF401RE.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\giova\Desktop\Embedded_Controller_project-1\direct_coding\voidProjF401RE\STM32F401RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="voidProjF401RE.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -u _printf_float -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
