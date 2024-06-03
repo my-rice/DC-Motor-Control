@@ -16,5 +16,10 @@ title('Sensor output')
 xlabel('Time (s)')
 ylabel('Voltage (V)')
 hold on
-plot(t,ones(size(t))*y_avg)
+
+% plot la media con una linea spessa
+plot(t,y_avg*ones(size(t)),'LineWidth',2)
 legend('Sensor output','mean')
+% set x and y limits
+xlim([0 180])
+ylim([2.54 2.57])
