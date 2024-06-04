@@ -1,7 +1,8 @@
 pwmFreq = 2000;
 Ts = 0.001;
-Tfs = 0.00025;
-alpha = exp(-Tfs/Ts)
+Tf = Ts/2;
+Tfs = Tf/20;
+alpha = exp(-Tfs/Tf)
 
 %% Getting the L parameter
 % The reference is 0V in [0,3[ seconds, 12V in [3,6[ seconds and 0V in [6,9[

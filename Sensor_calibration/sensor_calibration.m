@@ -11,13 +11,14 @@ y = y.data.Data(:,:);
 % get the average value of the sensor output
 y_avg = mean(y);
 
+% plot the sensor output
 plot(t,y)
 title('Sensor output')
 xlabel('Time (s)')
 ylabel('Voltage (V)')
 hold on
 
-% plot la media con una linea spessa
+% plot the average value
 plot(t,y_avg*ones(size(t)),'LineWidth',2)
 legend('Sensor output','mean')
 % set x and y limits

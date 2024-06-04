@@ -35,7 +35,6 @@ num = tfdata(sys_int_d)
 num_int = -num{1}
 
 %% Anti wind-up
-
 [Q_vec,P_vec] = tfdata(sys_int_d,'v');
 Q_vec = -Q_vec
 Gamma_vec = [1 0];
