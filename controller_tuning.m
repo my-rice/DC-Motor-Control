@@ -6,6 +6,17 @@ if(rank(WR)==3)
 else
    disp("The system is not recheable!")
 end
+%% Recheability test with the extended state space
+A_e = [-8.2891 0 8.8101 0; 1 0 0 0; 0 0 -35.2405 0; 0 5.8438 0 0]
+B_e = [-1;0;8;0]
+
+WR_e = [B_e A_e*B_e A_e^2*B_e A_e^3] % rechability matrix
+if(rank(WR)==4)
+    disp("The system is recheable!")
+else
+   disp("The system is not recheable!")
+end
+
 %% LQI implementation and tuning of the matrices
 Q = [0.01 0 0 0; 0 15 0 0; 0 0 0.01 0; 0 0 0 0.2] % definition of the matrix
 % that weights the states
