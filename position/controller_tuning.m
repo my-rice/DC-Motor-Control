@@ -25,7 +25,7 @@ R =  0.0002 % definition of the matrix that weights the input
 % for the gains of the state feedback controllore, the last one is of a
 % different sign, because the MATLAB lqi function, compute the error as:
 % desired_value - output
-kr = -1/(C*inv(A-B*K_tilde(1:3))*B) % DALLA TEORIA, we calculate kr
+kr = -1/(C*inv(A-B*K_tilde(1:3))*B) 
 %% Discretizing the integral term
 % To discretize the state feedback controller, it is just needed to
 % discretize the integral term:
