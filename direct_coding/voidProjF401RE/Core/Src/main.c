@@ -699,7 +699,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		// double speed = getSpeedByDelta(
 		// 		getTicksDelta(currentTicks, lastTicks));
 
-		if(control_step_counter % (int)((int)WAITING*2/Ts) == 0){
+		if(control_step_counter % (int)((int)WAITING/Ts) == 0){
 			referenceIndex = referenceIndex + 1;
 			if (referenceIndex >= 10)
 				referenceIndex = 0;

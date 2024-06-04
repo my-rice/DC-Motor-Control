@@ -181,24 +181,6 @@ void setPulseFromDutyValue(double dutyVal) {
 			(abs(dutyVal) * ((double )htim3.Init.Period)) / 100); //cast integer value to double to correctly perform division between decimal numbers
 }
 
-double getSpeedByDelta(double ticksDelta) {
-	return ticksDelta * 60 / (8400 * 0.005);
-}
-
-double getTicksDelta(double ticks, double last) {
-	double delta;
-
-	if (abs(ticks - last) <= ceil(12600 * 0.005))
-		delta = ticks - last;
-	else {
-		if (last > ticks)
-			delta = ticks + pow(2, 16) - 1 - last;
-		else
-			delta = ticks - pow(2, 16) + 1 - last;
-	}
-	return delta;
-}
-
 
 
 int cycleduration;
@@ -209,19 +191,19 @@ uint32_t tocControlStep;
 uint32_t controlComputationDuration;
 double e_last = 0;
 double Ts = 0.005;
-double referenceVals[8] = {0.0, 0.4, 0.3, 0.3, 0.2, 0.2, 0.3, 0.3};
+double referenceVals[10] = {0.3, 0.3, 0.3, 0.2, 0.2, 0.2, 0.1, 0.1, 0.1, 0.0};
 double referenceVal;
+int referenceIndex = 0;
 uint32_t k_controller = -1;
 int samplingPrescaler = 2;
 int samplingPrescalerCounter = 0;
-
-double ticksStar = 0;
 
 double windup_last = 0;
 double k = 1.4543;
 double alpha = 0.9512;
 double current_old = 0;
 double current_filtered_old = 0;
+int control_step_counter = 0;
 
 
 double sign(double x) {
@@ -229,15 +211,6 @@ double sign(double x) {
 		return 1;
 	else
 		return -1;
-}
-
-
-double getPositionByDelta(double ticksDelta) {
-	//
-	ticksStar = ticksStar + (double)ticksDelta;
-	double completeTheta = 2*3.14159265359*(ticksStar/8400);
-	double position=sign(completeTheta)*fmod(completeTheta,2*3.14159265359);
-	return position;
 }
 
 
@@ -284,7 +257,7 @@ int main(void)
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
   HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_2);
 
-	int referenceIndex = 0;
+	//int referenceIndex = 0;
 
 	referenceVal = referenceVals[referenceIndex];
 	printf("INIT\n\r"); // initialize the Matlab tool for COM data acquiring
@@ -306,11 +279,11 @@ int main(void)
 						retrieved.current_u, retrieved.current_y, retrieved.filtered,
 						retrieved.cycleCoreDuration, retrieved.last_tick,retrieved.reference); // send values via USART using format: value1, value2, value3, ... valuen \n \r
 			}
-			referenceVal = referenceVals[referenceIndex];
-			referenceIndex = referenceIndex + 1;
+			//referenceVal = referenceVals[referenceIndex];
+			//referenceIndex = referenceIndex + 1;
 			HAL_Delay(WAITING*1000); // takes a time value in ms
-			if (referenceIndex > 7)
-				referenceIndex = 0;
+			//if (referenceIndex > 7)
+			//	referenceIndex = 0;
 
 			/* USER CODE END WHILE */
 
@@ -643,6 +616,7 @@ static void MX_GPIO_Init(void)
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 	if (htim == &htim4) {
 		k_controller = k_controller + 1;
+		control_step_counter += 1;
 		if (k_controller == 0) {
 			ticControlStep = HAL_GetTick();
 		}
@@ -650,31 +624,39 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 
 		currentTicks = (double) __HAL_TIM_GET_COUNTER(&htim1); //take current value of ticks counting the encoder edges
 
+		if(control_step_counter % (int)((int)WAITING/Ts) == 0){
+			referenceIndex = referenceIndex + 1;
+			if (referenceIndex >= 10)
+				referenceIndex = 0;
+			referenceVal = referenceVals[referenceIndex];
+		}
+
+
 		HAL_ADC_Start(&hadc1);
 		HAL_ADC_PollForConversion(&hadc1, HAL_MAX_DELAY);
 		uint32_t adc_value = HAL_ADC_GetValue(&hadc1);
-    double adc_voltage = (double)adc_value * 3.3 / 4095; // Conversion to voltage (maximum ADC value = 4096, reference voltage = 3.3V)
+		double adc_voltage = (double)adc_value * 3.3 / 4095; // Conversion to voltage (maximum ADC value = 4096, reference voltage = 3.3V)
 		double current = (adc_voltage-2.5530)/0.185; // Conversion to current (maximum current = 12A, offset = 2.5530V, sensitivity = 0.185V/A)
 
-    // filtering the current
-    if (k_controller == 0) {
-      current_old = current;
-    }
-    double current_filtered = alpha * current_filtered_old + (1 - alpha) * current_old;
+		// filtering the current
+		if (k_controller == 0) {
+		  current_old = current;
+		}
+		double current_filtered = alpha * current_filtered_old + (1 - alpha) * current_old;
 
-    double e = referenceVal - k*current_filtered;
-    double zq_gamma = 1.792 * e - 1.542 * e_last;
-    double u = zq_gamma + windup_last;
-    if (u > 12)
-      u = 12;
-    else if (u < -12)
-      u = -12; 
+		double e = referenceVal - k*current_filtered;
+		double zq_gamma = 0.675 * e - 0.45 * e_last; // 0.675 z - 0.45
+		double u = zq_gamma + windup_last;
+		if (u > 12)
+		  u = 12;
+		else if (u < -12)
+		  u = -12;
     
 		setPulseFromDutyValue(u * 100 / 12);
 
-    current_filtered_old = current_filtered;
-    current_old = current;
-    windup_last = u;
+		current_filtered_old = current_filtered;
+		current_old = current;
+		windup_last = u;
 		e_last = e;
 
 		controlComputationDuration = HAL_GetTick() - tocControlStep;
@@ -683,8 +665,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
 		// recording data in the buffer
 		record r;
 		r.current_u = u;
-		r.current_y = current;
-    r.filtered = current_filtered;
+		r.current_y = k*current_filtered;
+		r.filtered = current_filtered;
 		r.last_tick = temp;
 		r.reference = referenceVal;
 		r.current_tick = currentTicks;

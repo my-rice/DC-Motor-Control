@@ -3,8 +3,9 @@ clear all, clc;
 %km = 6.88; rpm -> 0.7205. %k = 0.85; motore 25D
 %Tm = 0.065;
 Ts = 0.005;
-Tfs = 0.00025;
-alpha = exp(-Tfs/Ts)
+Tf = Ts/2;
+Tfs = Tf/20; %0.000125;
+alpha = exp(-Tfs/Tf)
 
 km = 0.6876;
 kt = 1/km
