@@ -1,0 +1,15 @@
+../Core/Src/main.c:85:6:cb_init	16	static
+../Core/Src/main.c:100:6:cb_free	0	static
+../Core/Src/main.c:105:6:cb_push_back	16	static
+../Core/Src/main.c:119:6:cb_pop_front	16	static
+../Core/Src/main.c:148:5:_write	8	static
+../Core/Src/main.c:162:6:setPulseFromDutyValue	24	static
+../Core/Src/main.c:181:8:getSpeedByDelta	8	static
+../Core/Src/main.c:185:8:getTicksDelta	32	static
+../Core/Src/main.c:331:8:sign	8	static
+../Core/Src/main.c:339:8:getPositionByDelta	8	static
+../Core/Src/main.c:421:6:SystemClock_Config	88	static,ignoring_inline_asm
+../Core/Src/main.c:353:5:main	152	static,ignoring_inline_asm
+../Core/Src/main.c:663:9:get_x_hat	160	static
+../Core/Src/main.c:689:6:HAL_TIM_PeriodElapsedCallback	152	static
+../Core/Src/main.c:764:6:Error_Handler	0	static,ignoring_inline_asm
