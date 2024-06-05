@@ -81,3 +81,15 @@ A = sys_pade.A
 B = sys_pade.B
 C = sys_pade.C
 D = sys_pade.D
+
+%% Plot for padè 
+close all
+plot(t,y_filtered)
+hold
+step(G*12)
+step(G_senza_pade*12)
+legend('y_filtered','pade approx','no pade')
+legend('y\_filtered','pade approx','no pade')
+ylabel('Speed (rpm)')
+title('Differences in models')
+
