@@ -28,6 +28,6 @@ The kit provided consists of:
 - Current sensor ACS714: it is a Hall effect-based linear current sensor that can be used to measure the
  current flowing through the motor.
 <p align="center">
-  <img src="[http://some_place.com/image.png](https://github.com/user-attachments/assets/f965d611-9de3-414a-be8f-11bec885afba)" />
+  <img src="https://github.com/user-attachments/assets/f965d611-9de3-414a-be8f-11bec885afba" />
 </p>
 
