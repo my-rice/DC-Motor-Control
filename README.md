@@ -2,6 +2,10 @@
 
 State-feedback (LQR) and torque control for a brushed DC geared motor using an STM32F4 microcontroller. From modeling and identification to embedded implementation and validation.
 
+<div align="center">
+  <img src="https://github.com/user-attachments/assets/f965d611-9de3-414a-be8f-11bec885afba" alt="Hardware setup" />
+</div>
+
 ---
 
 ## 🚀 Highlights
@@ -122,10 +126,6 @@ Licensed under the BSD 3-Clause License. See `LICENSE` for details.
 * Gearmotor: 131.25:1 reduction; effective resolution 8400 counts / rev (64 CPR × gear ratio).
 * Driver (X‑NUCLEO‑IHM04A1): Dual full H‑bridge; directional control + enable/PWM pins.
 * ACS714: Hall effect current sensing enabling torque estimation.
-
-<div align="center">
-  <img src="https://github.com/user-attachments/assets/f965d611-9de3-414a-be8f-11bec885afba" alt="Hardware setup" />
-</div>
 
 ---
 
